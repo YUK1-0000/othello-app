@@ -21,12 +21,49 @@ class Model:
             for x in LENGTH/2-1, LENGTH/2:
                 self.board_data[int(y)][int(x)] = WHITE if x == y else BLACK
     
+    def on_button_pressed(self, x: int, y: int) -> None:
+        if self.flippable(x, y):
+            self.move_disc(x, y)
+    
     def move_disc(self, x: int, y: int) -> None:
         self.board_data[y][x] = self.player.get()
+        self.flip(x, y)
         self.change_player()
     
+    def flippable(self, x: int, y: int) -> bool:
+        if self.board_data[y][x] == EMPTY:
+            for i in (-1, 0, 1):
+                for j in (-1, 0, 1):
+                    if 0 <= y+i < LENGTH and 0 <= x+j < LENGTH:
+                        if self.board_data[y+i][x+j] == self.player.get()*-1:
+                            count = 1
+                            for n in range(LENGTH):
+                                if 0 <= y+i*(n+1) < LENGTH and 0 <= x+j*(n+1) < LENGTH:
+                                    if self.board_data[y+i*(n+1)][x+j*(n+1)] == self.player.get()*-1:
+                                        count += 1
+                                    elif self.board_data[y+i*(n+1)][x+j*(n+1)] == self.player.get():
+                                        return True
+        return False
+
+    def flip(self, x: int, y: int) -> None:
+        for i in (-1, 0, 1):
+            for j in (-1, 0, 1):
+                if 0 <= y+i < LENGTH and 0 <= x+j < LENGTH:
+                    if self.board_data[y+i][x+j] == self.player.get()*-1:
+                        count = 1
+                        for n in range(LENGTH):
+                            if 0 <= y+i*(n+1) < LENGTH and 0 <= x+j*(n+1) < LENGTH:
+                                if self.board_data[y+i*(n+1)][x+j*(n+1)] == EMPTY:
+                                    break
+                                elif self.board_data[y+i*(n+1)][x+j*(n+1)] == self.player.get()*-1:
+                                    count += 1
+                                elif self.board_data[y+i*(n+1)][x+j*(n+1)] == self.player.get():
+                                    for m in range(count):
+                                        self.board_data[y+i*(m+1)][x+j*(m+1)] = self.player.get()
+                                    break
+    
     def change_player(self) -> None:
-        self.player.set(self.player.get() * -1)
+        self.player.set(self.player.get()*-1)
 
 
 class View(tk.Frame):
@@ -66,7 +103,7 @@ class View(tk.Frame):
         self.pack()
 
 
-class App:
+class Controller:
     def __init__(self, root: tk.Tk) -> None:
         self.view = View(root)
         self.model = Model(root)
@@ -76,14 +113,13 @@ class App:
             for x, btn in enumerate(btns):
                 btn.configure(
                     textvariable=self.model.board_texts[y][x],
-                    command=lambda x=x, y=y: self.on_move_disc(x, y)
+                    command=lambda x=x, y=y: self.on_button_pressed(x, y)
                 )
-        
         self.update()
 
     # 石を打つときに呼ばれる関数
-    def on_move_disc(self, x: int, y: int) -> None:
-        self.model.move_disc(x, y)
+    def on_button_pressed(self, x: int, y: int) -> None:
+        self.model.on_button_pressed(x, y)
         self.update()
 
     # 表示の更新
@@ -101,7 +137,7 @@ class App:
 
 def main() -> None:
     root = tk.Tk()
-    App(root)
+    Controller(root)
     root.mainloop()
 
 
