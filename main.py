@@ -4,7 +4,7 @@ import tkinter as tk
 LMB = "<Button-1>"
 LENGTH = 8
 EMPTY, WHITE, BLACK = 0, 1, -1
-DISC_TYPES = ("", "○", "●")
+DISK_TYPES = ("", "○", "●")
 ARROW_TYPES = ("", "->", "<-")
 DIRECTIONS = (
     (-1, -1), (-1, 0), (-1, 1),
@@ -180,12 +180,12 @@ class View(tk.Frame):
 
         self.label_frame = tk.Frame(self)
         self.arrow_label = tk.Label(self.label_frame, font=("", 25))
-        self.black_disc_label = tk.Label(self.label_frame, text=DISC_TYPES[BLACK], font=("", 25))
-        self.white_disc_label = tk.Label(self.label_frame, text=DISC_TYPES[WHITE], font=("", 25))
+        self.black_disk_label = tk.Label(self.label_frame, text=DISK_TYPES[BLACK], font=("", 25))
+        self.white_disk_label = tk.Label(self.label_frame, text=DISK_TYPES[WHITE], font=("", 25))
 
         self.label_frame.pack(fill=tk.BOTH)
-        self.white_disc_label.pack(side=tk.RIGHT)
-        self.black_disc_label.pack(side=tk.LEFT)
+        self.white_disk_label.pack(side=tk.RIGHT)
+        self.black_disk_label.pack(side=tk.LEFT)
         
         self.pack()
 
@@ -214,7 +214,7 @@ class Controller:
         # 石の表示を更新
         for y, data in enumerate(self.model.board_data):
             for x, square_data in enumerate(data):
-                self.model.board_texts[y][x].set(DISC_TYPES[square_data])
+                self.model.board_texts[y][x].set(DISK_TYPES[square_data])
         
         # 矢印の表示を更新
         self.view.arrow_label.pack_forget()
