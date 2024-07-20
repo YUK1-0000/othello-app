@@ -6,6 +6,11 @@ LENGTH = 8
 EMPTY, WHITE, BLACK = 0, 1, -1
 DISC_TYPES = ("", "○", "●")
 ARROW_TYPES = ("", "->", "<-")
+DIRECTIONS = (
+    (-1, -1), (-1, 0), (-1, 1),
+    ( 0, -1),          ( 0, 1),
+    ( 1, -1), ( 1, 0), ( 1, 1)
+)
 
 
 class Model:
@@ -22,7 +27,7 @@ class Model:
                 self.board_data[int(y)][int(x)] = WHITE if x == y else BLACK
     
     def on_button_pressed(self, x: int, y: int) -> None:
-        if self.flippable(x, y):
+        if self.board_data[y][x] == EMPTY and self.flippable(x, y):
             self.move_disc(x, y)
     
     def move_disc(self, x: int, y: int) -> None:
@@ -31,36 +36,65 @@ class Model:
         self.change_player()
     
     def flippable(self, x: int, y: int) -> bool:
-        if self.board_data[y][x] == EMPTY:
-            for i in (-1, 0, 1):
-                for j in (-1, 0, 1):
-                    if 0 <= y+i < LENGTH and 0 <= x+j < LENGTH:
-                        if self.board_data[y+i][x+j] == self.player.get()*-1:
-                            count = 1
-                            for n in range(LENGTH):
-                                if 0 <= y+i*(n+1) < LENGTH and 0 <= x+j*(n+1) < LENGTH:
-                                    if self.board_data[y+i*(n+1)][x+j*(n+1)] == self.player.get()*-1:
-                                        count += 1
-                                    elif self.board_data[y+i*(n+1)][x+j*(n+1)] == self.player.get():
-                                        return True
+        # 8方向を探索
+        for d in DIRECTIONS:
+            # 1マス目の探索
+            try:
+                if self.board_data[y+d[0]][x+d[1]] != self.player.get()*-1:
+                    continue
+            except IndexError:
+                continue
+            
+            # 2マス目以降の探索
+            opponent_disc_exist = False
+            
+            for n in range(1, LENGTH):
+                try:
+                    square_data = self.board_data[y+d[0]*n][x+d[1]*n]
+                except IndexError:
+                    break
+                
+                if square_data == EMPTY:
+                    break
+                
+                if square_data == self.player.get()*-1:
+                    opponent_disc_exist = True
+                
+                elif square_data == self.player.get() and opponent_disc_exist:
+                    return True
+    
         return False
 
     def flip(self, x: int, y: int) -> None:
-        for i in (-1, 0, 1):
-            for j in (-1, 0, 1):
-                if 0 <= y+i < LENGTH and 0 <= x+j < LENGTH:
-                    if self.board_data[y+i][x+j] == self.player.get()*-1:
-                        count = 1
-                        for n in range(LENGTH):
-                            if 0 <= y+i*(n+1) < LENGTH and 0 <= x+j*(n+1) < LENGTH:
-                                if self.board_data[y+i*(n+1)][x+j*(n+1)] == EMPTY:
-                                    break
-                                elif self.board_data[y+i*(n+1)][x+j*(n+1)] == self.player.get()*-1:
-                                    count += 1
-                                elif self.board_data[y+i*(n+1)][x+j*(n+1)] == self.player.get():
-                                    for m in range(count):
-                                        self.board_data[y+i*(m+1)][x+j*(m+1)] = self.player.get()
-                                    break
+        # 8方向を探索
+        for d in DIRECTIONS:
+            # 1マス目の探索
+            try:
+                if self.board_data[y+d[0]][x+d[1]] != self.player.get()*-1:
+                    continue
+            except IndexError:
+                continue
+            
+            opponent_disc_count = 1
+            
+            # 2マス目以降の探索
+            for n in range(1, LENGTH):
+                try:
+                    square_data = self.board_data[y+d[0]*n][x+d[1]*n]
+                except IndexError:
+                    break
+                
+                if square_data == EMPTY:
+                    break # 返せる石が無いのでこの方向の探索をやめる
+                
+                if square_data == self.player.get()*-1:
+                    opponent_disc_count += 1
+                
+                elif square_data == self.player.get():
+                    # 石を返す
+                    for m in range(1, opponent_disc_count+1):
+                        self.board_data[y+d[0]*m][x+d[1]*m] = self.player.get()
+                    break
     
     def change_player(self) -> None:
         self.player.set(self.player.get()*-1)
@@ -108,7 +142,7 @@ class Controller:
         self.view = View(root)
         self.model = Model(root)
         
-        # ボタンにコマンドとテキスト変数を設定
+        # ボタンにコマンドとテキストの変数を設定
         for y, btns in enumerate(self.view.board_btns):
             for x, btn in enumerate(btns):
                 btn.configure(
@@ -126,8 +160,8 @@ class Controller:
     def update(self) -> None:
         # 石の表示を更新
         for y, data in enumerate(self.model.board_data):
-            for x, datum in enumerate(data):
-                self.model.board_texts[y][x].set(DISC_TYPES[datum])
+            for x, square_data in enumerate(data):
+                self.model.board_texts[y][x].set(DISC_TYPES[square_data])
         
         # 矢印の表示を更新
         self.view.arrow_label.pack_forget()
