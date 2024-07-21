@@ -293,7 +293,12 @@ class Controller:
             for x in range(LENGTH):
                 self.view.btn_texts[y][x].set(DISK_ICONS[self.model.board_data[y][x]])
         
-        # 矢印の表示を更新
+        # ゲーム終了判定
+        if self.model.is_game_over():
+            self.game_over()
+            return
+
+        # 矢印の更新
         self.view.arrow_label.pack_forget()
         self.view.arrow_label.configure(text=ARROW_TYPES[self.model.player.get()])
         self.view.arrow_label.pack(side=tk.RIGHT if self.model.player.get() == WHITE else tk.LEFT)
