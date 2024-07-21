@@ -288,7 +288,7 @@ class Controller:
 
     # 表示の更新
     def update(self) -> None:
-        # 石の表示を更新
+        # 盤面の更新
         for y in range(LENGTH):
             for x in range(LENGTH):
                 self.view.btn_texts[y][x].set(DISK_ICONS[self.model.board_data[y][x]])
@@ -298,7 +298,7 @@ class Controller:
         self.view.arrow_label.configure(text=ARROW_TYPES[self.model.player.get()])
         self.view.arrow_label.pack(side=tk.RIGHT if self.model.player.get() == WHITE else tk.LEFT)
         
-        # パスボタンの表示
+        # パスボタンの更新
         self.view.pass_btn.pack_forget()
         if not self.model.placeable_square_exists():
             self.view.pass_btn.pack()
