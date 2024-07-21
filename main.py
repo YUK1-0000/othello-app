@@ -12,11 +12,12 @@ DIRECTIONS = (
     ( 1, -1), ( 1, 0), ( 1, 1)
 )
 
+LMB = "Button-<1>"
 FONT = ""
 FONT_SIZES = {
-    "button": 10,
-    "label": 25
+    "L": 25
 }
+pass_BTN_MSG = "pass"
 GAME_OVER_MSG = "GAME OVER!"
 
 
@@ -25,21 +26,22 @@ class Model:
         self.player = tk.IntVar(value=BLACK)
         self.disk_counts = [tk.IntVar() for _ in range(len(DISK_ICONS))]
         self.board_data = [[EMPTY for _ in range(LENGTH)] for _ in range(LENGTH)]
-        
         self.reset()
     
     def on_btn_pressed(self, x: int, y: int) -> None:
-        if self.board_data[y][x] == EMPTY and self.neighbor_flippable_disk_exists(x, y):
-            self.place_disk(x, y)
+        if self.is_placeable(x, y):
+            self.place_disk(x, y, self.player.get())
+            self.flip(x, y)
+            self.count_disk()
+            self.turn_end()
     
-    def place_disk(self, x: int, y: int) -> None:
-        self.board_data[y][x] = self.player.get()
-        self.flip(x, y)
-        self.turn_end()
+    def place_disk(self, x: int, y: int, disk_type: int) -> None:
+        self.board_data[y][x] = disk_type
     
     def flip(self, x: int, y: int) -> None:
         # 8方向を探索
         for d in DIRECTIONS:
+            
             # 1マス目の探索
             y_, x_ = y+d[0], x+d[1]
             
@@ -67,16 +69,16 @@ class Model:
                     opponent_disk_count += 1
                 
                 elif square_data == self.player.get():
-                    # 探索した石を返す
+                    # 石を返す
                     for m in range(1, opponent_disk_count):
-                        self.board_data[y+d[0]*m][x+d[1]*m] = self.player.get()
+                        self.place_disk(x+d[1]*m, y+d[0]*m, self.player.get())
                     break
     
     def turn_end(self) -> None:
-        self.count_disk()
         self.change_player()
-        if not self.flippable_disk_exists():
-            self.change_player()
+    
+    def change_player(self) -> None:
+        self.player.set(self.player.get()*-1)
     
     def count_disk(self) -> None:
         [int_var.set(0) for int_var in self.disk_counts]
@@ -84,9 +86,6 @@ class Model:
             for x in range(LENGTH):
                 disk_type = self.board_data[y][x]
                 self.disk_counts[disk_type].set(self.disk_counts[disk_type].get()+1)
-    
-    def change_player(self) -> None:
-        self.player.set(self.player.get()*-1)
     
     def reset(self) -> None:
         self.player.set(BLACK)
@@ -97,30 +96,40 @@ class Model:
         for y in range(LENGTH):
             for x in range(LENGTH):
                 if x in (LENGTH/2, LENGTH/2-1) and y in (LENGTH/2, LENGTH/2-1):
-                    value = WHITE if x == y else BLACK
-                else:
-                    value = EMPTY
-                self.board_data[y][x] = value
+                    disk_type = WHITE if x == y else BLACK
+                disk_type = EMPTY
+                if x < 4:
+                    disk_type = WHITE
+                if x == 4:
+                    disk_type = BLACK
+                
+                #else :
+                #    disk_type = EMPTY
+                self.place_disk(x, y, disk_type)
     
     def is_game_over(self) -> bool:
-        if not self.flippable_disk_exists() or not self.empty_square_exists():
-            return True
-        return False
+        return not self.empty_square_exists() or self.is_perfect_win()
     
     def empty_square_exists(self) -> bool:
         return any(any(data) for data in self.board_data)
+    
+    def is_perfect_win(self) -> bool:
+        return not (self.disk_counts[BLACK].get() and self.disk_counts[WHITE].get())
     
     def flippable_disk_exists(self) -> bool:
         return any(
             any(
                 self.board_data[y][x] == EMPTY
-                and self.neighbor_flippable_disk_exists(x, y)
+                and self.is_placeable(x, y)
                 for x in range(LENGTH)
             )
             for y in range(LENGTH)
         )
     
-    def neighbor_flippable_disk_exists(self, x: int, y: int) -> bool:
+    def is_placeable(self, x: int, y: int) -> bool:
+        if self.board_data[y][x] != EMPTY:
+            return False
+        
         # 8方向を探索
         for d in DIRECTIONS:
             # 1マス目の探索
@@ -165,15 +174,18 @@ class View(tk.Frame):
         root.geometry("360x380")
         root.resizable(width=False, height=False)
         
-        self.board_frame = tk.Frame(self)
         self.btn_texts = [[tk.StringVar() for _ in range(LENGTH)] for _ in range(LENGTH)]
+        
+        # 盤面
+        self.board_frame = tk.Frame(self)
+        
         self.board_btns = [
             [
                 tk.Button(
                     self.board_frame,
                     width=5,
                     height=2,
-                    textvariable=self.btn_texts[y][x]
+                    textvariable=self.btn_texts[y][x],
                 )
                 for x in range(LENGTH)
             ]
@@ -181,41 +193,48 @@ class View(tk.Frame):
         ]
         
         self.board_frame.pack()
-        [
-            [
+        
+        for y in range(LENGTH):
+            for x in range(LENGTH):
                 self.board_btns[y][x].grid(column=x, row=y)
-                for x in range(LENGTH)
-            ]
-            for y in range(LENGTH)
-        ]
 
-        self.label_frame = tk.Frame(self)
-        self.arrow_label = tk.Label(self.label_frame, font=(FONT, FONT_SIZES["label"]))
+        # 画面下側
+        self.bottom_frame = tk.Frame(self)
+        
+        self.pass_btn = tk.Button(
+            self.bottom_frame,
+            font=(FONT, FONT_SIZES["L"]),
+            text=pass_BTN_MSG
+        )
+        
+        self.arrow_label = tk.Label(self.bottom_frame, font=(FONT, FONT_SIZES["L"]))
         self.game_over_label = tk.Label(
-            self.label_frame,
+            self.bottom_frame,
             text=GAME_OVER_MSG,
-            font=(FONT, FONT_SIZES["label"])
+            font=(FONT, FONT_SIZES["L"])
         )
         self.disk_labels = [
             tk.Label(
-                self.label_frame,
-                font=(FONT, FONT_SIZES["label"]),
+                self.bottom_frame,
+                font=(FONT, FONT_SIZES["L"]),
                 textvariable=tk.StringVar(value=DISK_ICONS[type_])
             )
             for type_ in range(len(DISK_ICONS))
         ]
         self.disk_count_labels = [
             tk.Label(
-                self.label_frame,
-                font=(FONT, FONT_SIZES["label"]),
+                self.bottom_frame,
+                font=(FONT, FONT_SIZES["L"]),
             )
             for _ in range(len(DISK_ICONS))
         ]
 
-        self.label_frame.pack(fill=tk.BOTH)
+        self.bottom_frame.pack(fill=tk.BOTH)
+        
         for i, s in (zip(range(1, len(DISK_ICONS)), (tk.RIGHT, tk.LEFT))):
             self.disk_count_labels[i].pack(side=s)
             self.disk_labels[i].pack(side=s)
+        
         self.pack()
     
     def show_game_over_msg(self) -> None:
@@ -243,26 +262,34 @@ class Controller:
         self.menu_bar = MenuBar(root, reset_command=self.reset)
         
         # ボタンにコマンドとテキストの変数を設定
+        self.view.pass_btn.configure(
+            command=lambda:[
+                self.change_player(),
+                self.view.pass_btn.pack_forget()
+            ]
+        )
         for y in range(LENGTH):
             for x in range(LENGTH):
                 self.view.board_btns[y][x].configure(
                     textvariable=self.view.btn_texts[y][x],
                     command=lambda x=x, y=y: self.on_btn_pressed(x, y)
                 )
-        [
+        
+        for i in range(len(DISK_ICONS)):
             self.view.disk_count_labels[i].configure(
                 textvariable=self.model.disk_counts[i]
             )
-            for i in range(len(DISK_ICONS))
-        ]
+        
         self.update()
 
     # 石を打つときに呼ばれる関数
     def on_btn_pressed(self, x: int, y: int) -> None:
         self.model.on_btn_pressed(x, y)
         self.update()
-        if self.model.is_game_over():
-            self.game_over()
+
+    def change_player(self) -> None:
+        self.model.change_player()
+        self.update()
 
     # 表示の更新
     def update(self) -> None:
@@ -275,6 +302,11 @@ class Controller:
         self.view.arrow_label.pack_forget()
         self.view.arrow_label.configure(text=ARROW_TYPES[self.model.player.get()])
         self.view.arrow_label.pack(side=tk.RIGHT if self.model.player.get() == WHITE else tk.LEFT)
+        
+        # パスボタンの表示
+        if not self.model.flippable_disk_exists():
+            self.view.pass_btn.pack()
+    
     
     def game_over(self) -> None:
         self.view.show_game_over_msg()
