@@ -262,12 +262,7 @@ class Controller:
         self.menu_bar = MenuBar(root, reset_command=self.reset)
         
         # ボタンにコマンドとテキストの変数を設定
-        self.view.pass_btn.configure(
-            command=lambda:[
-                self.change_player(),
-                self.view.pass_btn.pack_forget()
-            ]
-        )
+        self.view.pass_btn.configure(command=self.change_player)
         for y in range(LENGTH):
             for x in range(LENGTH):
                 self.view.board_btns[y][x].configure(
@@ -304,6 +299,7 @@ class Controller:
         self.view.arrow_label.pack(side=tk.RIGHT if self.model.player.get() == WHITE else tk.LEFT)
         
         # パスボタンの表示
+        self.view.pass_btn.pack_forget()
         if not self.model.placeable_square_exists():
             self.view.pass_btn.pack()
     
