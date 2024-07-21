@@ -17,7 +17,7 @@ FONT = ""
 FONT_SIZES = {
     "L": 25
 }
-pass_BTN_MSG = "pass"
+PASS_BTN_MSG = "Pass"
 GAME_OVER_MSG = "GAME OVER!"
 
 
@@ -116,7 +116,7 @@ class Model:
     def is_perfect_win(self) -> bool:
         return not (self.disk_counts[BLACK].get() and self.disk_counts[WHITE].get())
     
-    def flippable_disk_exists(self) -> bool:
+    def placeable_square_exists(self) -> bool:
         return any(
             any(
                 self.board_data[y][x] == EMPTY
@@ -204,7 +204,7 @@ class View(tk.Frame):
         self.pass_btn = tk.Button(
             self.bottom_frame,
             font=(FONT, FONT_SIZES["L"]),
-            text=pass_BTN_MSG
+            text=PASS_BTN_MSG
         )
         
         self.arrow_label = tk.Label(self.bottom_frame, font=(FONT, FONT_SIZES["L"]))
@@ -304,7 +304,7 @@ class Controller:
         self.view.arrow_label.pack(side=tk.RIGHT if self.model.player.get() == WHITE else tk.LEFT)
         
         # パスボタンの表示
-        if not self.model.flippable_disk_exists():
+        if not self.model.placeable_square_exists():
             self.view.pass_btn.pack()
     
     
