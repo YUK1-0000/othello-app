@@ -312,17 +312,15 @@ class Controller:
     def update_btns(self, hilite_x: int | None=None, hilite_y: int | None=None) -> None:
         for y in range(BOARD_LEN):
             for x in range(BOARD_LEN):
-                # データとテキストを同期
-                self.view.btn_texts[y][x].set(DISK_ICONS[self.model.board_data[y][x]])
-                
-                # 石を打てるマスを強調
-                self.view.board_btns[y][x].configure(
-                    relief=tk.SOLID if self.model.is_placeable(x, y) else tk.GROOVE
+                # データとテキストを同期し、配置可能なマスは強調
+                self.view.btn_texts[y][x].set(
+                    "x" if self.model.is_placeable(x, y)
+                    else DISK_ICONS[self.model.board_data[y][x]]
                 )
                 
-                # 引数の座標のマスの色を変える
+                # 引数の座標のマスを強調
                 self.view.board_btns[y][x].configure(
-                    bg=HILITE_CLR if x == hilite_x and y == hilite_y else "white"
+                    relief=tk.SOLID if x == hilite_x and y == hilite_y else tk.GROOVE
                 )
     
     def game_over(self) -> None:
