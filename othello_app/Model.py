@@ -17,16 +17,16 @@ class Model:
         self.board_data = [[EMPTY for _ in range(BOARD_LEN)] for _ in range(BOARD_LEN)]
         self.reset()
     
-    def on_btn_pressed(self, x: int, y: int) -> None:
-        self.place_disk(x, y, self.player.get())
-        self.flip(x, y)
+    def on_btn_pressed(self, y: int, x: int) -> None:
+        self.place_disk(y, x, self.player.get())
+        self.flip(y, x)
         self.count_disk()
         self.turn_end()
     
-    def place_disk(self, x: int, y: int, disk_type: int) -> None:
+    def place_disk(self, y: int, x: int, disk_type: int) -> None:
         self.board_data[y][x] = disk_type
     
-    def flip(self, x: int, y: int) -> None:
+    def flip(self, y: int, x: int) -> None:
         # 8方向を探索
         for d in DIRECTIONS:
             
@@ -87,7 +87,18 @@ class Model:
                     disk_type = WHITE if x == y else BLACK
                 else :
                     disk_type = EMPTY
-                self.place_disk(x, y, disk_type)
+                self.place_disk(y, x, disk_type)
+    
+    def get_placeable_coords(self) -> list[list[int]]:
+        return[
+            i for i in
+            [
+                [y, x] if self.is_placeable(y, x) else None
+                for x in range(BOARD_LEN)
+                for y in range(BOARD_LEN)
+            ]
+            if i
+        ]
     
     def is_game_over(self) -> bool:
         return self.is_board_filled() or self.is_perfect_win()
@@ -98,17 +109,7 @@ class Model:
     def is_perfect_win(self) -> bool:
         return not (self.disk_counts[BLACK].get() and self.disk_counts[WHITE].get())
     
-    def placeable_sqr_exists(self) -> bool:
-        return any(
-            any(
-                self.board_data[y][x] == EMPTY
-                and self.is_placeable(x, y)
-                for x in range(BOARD_LEN)
-            )
-            for y in range(BOARD_LEN)
-        )
-    
-    def is_placeable(self, x: int, y: int) -> bool:
+    def is_placeable(self, y: int, x: int) -> bool:
         if self.board_data[y][x] != EMPTY:
             return False
         

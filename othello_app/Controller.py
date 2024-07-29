@@ -1,6 +1,6 @@
 import tkinter as tk
-from M import Model
-from V import SuperFrame, MenuBar
+from .model import Model
+from .view import SuperFrame, MenuBar
 
 
 BOARD_LEN = 8
@@ -21,7 +21,7 @@ class Controller:
             for x in range(BOARD_LEN):
                 self.super_frame.board_btns[y][x].configure(
                     textvariable=self.super_frame.btn_texts[y][x],
-                    command=lambda x=x, y=y: self.on_btn_pressed(x, y)
+                    command=lambda y=y, x=x: self.on_btn_pressed(y, x)
                 )
         
         for i in range(len(DISK_ICONS)):
@@ -32,10 +32,10 @@ class Controller:
         self.update()
 
     # 石を打つときに呼ばれる関数
-    def on_btn_pressed(self, x: int, y: int) -> None:
-        if self.model.is_placeable(x, y):
-            self.model.on_btn_pressed(x, y)
-            self.update(x, y)
+    def on_btn_pressed(self, y: int, x: int) -> None:
+        if self.model.is_placeable(y, x):
+            self.model.on_btn_pressed(y, x)
+            self.update(y, x)
 
     def change_player(self) -> None:
         self.model.change_player()
@@ -60,21 +60,21 @@ class Controller:
         
         # パスボタンの更新
         self.super_frame.pass_btn.pack_forget()
-        if not self.model.placeable_sqr_exists():
+        if not self.model.get_placeable_coords():
             self.super_frame.pass_btn.pack()
 
-    def update_btns(self, hilite_x: int | None=None, hilite_y: int | None=None) -> None:
+    def update_btns(self, hilite_y: int | None=None, hilite_x: int | None=None) -> None:
         for y in range(BOARD_LEN):
             for x in range(BOARD_LEN):
                 # データとテキストを同期し、配置可能なマスは強調
                 self.super_frame.btn_texts[y][x].set(
-                    "x" if self.model.is_placeable(x, y)
+                    "x" if self.model.is_placeable(y, x)
                     else DISK_ICONS[self.model.board_data[y][x]]
                 )
                 
                 # 引数の座標のマスを強調
                 self.super_frame.board_btns[y][x].configure(
-                    relief=tk.SOLID if x == hilite_x and y == hilite_y else tk.GROOVE
+                    relief=tk.SOLID if y == hilite_y and x == hilite_x else tk.GROOVE
                 )
     
     def game_over(self) -> None:
