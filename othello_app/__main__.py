@@ -6,5 +6,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     import tkinter as tk
-    from .controller import Controller
+    from othello_app import Controller
     main()

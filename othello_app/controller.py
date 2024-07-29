@@ -1,6 +1,5 @@
 import tkinter as tk
-from .model import Model
-from .view import SuperFrame, MenuBar
+from othello_app import Model, SuperFrame, MenuBar
 
 
 BOARD_LEN = 8
