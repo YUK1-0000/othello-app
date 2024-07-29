@@ -1,6 +1,6 @@
 def main() -> None:
     root = tk.Tk()
-    app = Controller(root)
+    Controller(root)
     root.mainloop()
 
 

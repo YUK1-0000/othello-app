@@ -5,7 +5,7 @@ FONT_SIZES = {
     "m": 16,
     "l": 24
 }
-HILITE_CLR = "#ff4c4c"
+PLACEABLE_TXT = "x"
 GAME_OVER_MSG = "GAME OVER!"
 PASS_BTN_MSG = "Pass"
 

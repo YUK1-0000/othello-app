@@ -1,4 +1,5 @@
 import tkinter as tk
+from typing import Callable
 from .constants import (
     BLACK,
     EMPTY,
@@ -7,7 +8,7 @@ from .constants import (
     WINDOW_SIZE,
     FONT,
     FONT_SIZES,
-    HILITE_CLR,
+    PLACEABLE_TXT,
     GAME_OVER_MSG,
     PASS_BTN_MSG,
     SIDE_LEN,
@@ -25,7 +26,13 @@ class SuperFrame(tk.Frame):
         root.geometry(WINDOW_SIZE)
         root.resizable(width=False, height=False)
         
-        self.btn_texts = [[tk.StringVar() for _ in range(SIDE_LEN)] for _ in range(SIDE_LEN)]
+        self.btn_texts = [
+            [
+                tk.StringVar()
+                for _ in range(SIDE_LEN)
+            ]
+            for _ in range(SIDE_LEN)
+        ]
         
         # 盤面
         self.board_frame = tk.Frame(self)
@@ -37,7 +44,7 @@ class SuperFrame(tk.Frame):
                     width=SQR_BTN_W,
                     height=SQR_BTN_H,
                     font=(FONT, FONT_SIZES["m"]),
-                    textvariable=self.btn_texts[y][x],
+                    textvariable=self.btn_texts[y][x]
                 )
                 for x in range(SIDE_LEN)
             ]
@@ -59,21 +66,21 @@ class SuperFrame(tk.Frame):
             text=PASS_BTN_MSG
         )
         
-        self.arrow_label = tk.Label(self.bottom_frame, font=(FONT, FONT_SIZES["l"]))
-        self.game_over_label = tk.Label(
+        self.arrow_lbl = tk.Label(self.bottom_frame, font=(FONT, FONT_SIZES["l"]))
+        self.game_over_lbl = tk.Label(
             self.bottom_frame,
             text=GAME_OVER_MSG,
             font=(FONT, FONT_SIZES["l"])
         )
-        self.disk_labels = [
+        self.disk_lbls = [
             tk.Label(
                 self.bottom_frame,
                 font=(FONT, FONT_SIZES["l"]),
-                textvariable=tk.StringVar(value=DISK_TYPES[type_])
+                textvariable=tk.StringVar(value=DISK_TYPES[disk_clr])
             )
-            for type_ in range(len(DISK_TYPES))
+            for disk_clr in range(len(DISK_TYPES))
         ]
-        self.disk_count_labels = [
+        self.disk_count_lbls = [
             tk.Label(
                 self.bottom_frame,
                 font=(FONT, FONT_SIZES["l"]),
@@ -83,26 +90,41 @@ class SuperFrame(tk.Frame):
 
         self.bottom_frame.pack(fill=tk.BOTH)
         
-        for type_ in BLACK, WHITE:
-            s = tk.LEFT if type_ == BLACK else tk.RIGHT
-            self.disk_count_labels[type_].pack(side=s)
-            self.disk_labels[type_].pack(side=s)
+        for disk_clr in BLACK, WHITE:
+            s = tk.LEFT if disk_clr == BLACK else tk.RIGHT
+            self.disk_count_lbls[disk_clr].pack(side=s)
+            self.disk_lbls[disk_clr].pack(side=s)
         
         self.pack()
-    
-    def show_game_over_msg(self) -> None:
-        self.arrow_label.pack_forget()
-        self.game_over_label.pack()
+
+    def show_pass_btn(self) -> None:
+        self.pass_btn.pack()
+
+    def game_over(self) -> None:
+        self.arrow_lbl.pack_forget()
+        self.pass_btn.pack_forget()
+        self.game_over_lbl.pack()
     
     def reset(self) -> None:
-        self.game_over_label.pack_forget()
+        self.arrow_lbl.pack_forget()
+        self.pass_btn.pack_forget()
+        self.game_over_lbl.pack_forget()
 
 
 class MenuBar(tk.Menu):
-    def __init__(self, root: tk.Tk, *, reset_command) -> None:
+    def __init__(
+        self,
+        root: tk.Tk,
+        *,
+        reset_cmd: Callable,
+        undo_move_cmd: Callable
+    ) -> None:
+        
         super().__init__(root)
         root.config(menu=self)
         
         self.menu = tk.Menu(self, tearoff=False)
+        
         self.add_cascade(label="Menu", menu=self.menu)
-        self.menu.add_command(label="Reset Game", command=reset_command)
+        self.menu.add_command(label="Reset Game", command=reset_cmd)
+        self.menu.add_command(label="Undo a move", command=undo_move_cmd)

@@ -7,16 +7,12 @@ class Model:
         self.player = tk.IntVar(value=BLACK)
         self.disk_counts = [tk.IntVar() for _ in range(len(DISK_TYPES))]
         self.board_data = [[EMPTY for _ in range(SIDE_LEN)] for _ in range(SIDE_LEN)]
+        self.move_history: list[tuple[int, int] | None] = []
         self.reset()
-    
-    def on_btn_pressed(self, y: int, x: int) -> None:
-        self.place_disk(y, x, self.player.get())
-        self.flip(y, x)
-        self.count_disk()
-        self.turn_end()
-    
-    def place_disk(self, y: int, x: int, disk_type: int) -> None:
-        self.board_data[y][x] = disk_type
+
+    def place_disk(self, y: int, x: int, disk_clr: int) -> None:
+        self.board_data[y][x] = disk_clr
+        self.move_history.append((y, x))
     
     def flip(self, y: int, x: int) -> None:
         # 8方向を探索
@@ -51,41 +47,45 @@ class Model:
                 elif sqr_data == self.player.get():
                     # 石を返す
                     for m in range(1, opponent_disk_count):
-                        self.place_disk(y+d[0]*m, x+d[1]*m, self.player.get())
+                        self.board_data[y+d[0]*m][x+d[1]*m] = self.player.get()
                     break
-    
-    def turn_end(self) -> None:
-        self.change_player()
-    
+
     def change_player(self) -> None:
         self.player.set(self.player.get()*-1)
     
-    def count_disk(self) -> None:
+    def update_disk_count(self) -> None:
         [int_var.set(0) for int_var in self.disk_counts]
         for y in range(SIDE_LEN):
             for x in range(SIDE_LEN):
-                disk_type = self.board_data[y][x]
-                self.disk_counts[disk_type].set(self.disk_counts[disk_type].get()+1)
+                disk_clr = self.board_data[y][x]
+                self.disk_counts[disk_clr].set(self.disk_counts[disk_clr].get()+1)
     
     def reset(self) -> None:
         self.player.set(BLACK)
         self.reset_board_data()
-        self.count_disk()
+        self.move_history.clear()
+        self.update_disk_count()
     
     def reset_board_data(self) -> None:
         for y in range(SIDE_LEN):
             for x in range(SIDE_LEN):
                 if x in (SIDE_LEN/2, SIDE_LEN/2-1) and y in (SIDE_LEN/2, SIDE_LEN/2-1):
-                    disk_type = WHITE if x == y else BLACK
+                    disk_clr = (
+                        WHITE
+                        if x == y
+                        else BLACK
+                    )
                 else :
-                    disk_type = EMPTY
-                self.place_disk(y, x, disk_type)
+                    disk_clr = EMPTY
+                self.board_data[y][x] = disk_clr
     
-    def get_placeable_coords(self) -> list[list[int]]:
+    def get_placeable_coords(self) -> list[tuple[int, int]]:
         return [
             coord for coord in
             [
-                [y, x] if self.is_placeable(y, x) else None
+                (y, x)
+                if self.is_placeable(y, x)
+                else None
                 for x in range(SIDE_LEN)
                 for y in range(SIDE_LEN)
             ]
@@ -93,13 +93,13 @@ class Model:
         ]
     
     def is_game_over(self) -> bool:
-        return self.is_board_filled() or self.is_perfect_win()
+        return self.is_board_full() or self.is_perfect_win()
     
-    def is_board_filled(self) -> bool:
+    def is_board_full(self) -> bool:
         return all(all(data) for data in self.board_data)
     
     def is_perfect_win(self) -> bool:
-        return not (self.disk_counts[BLACK].get() and self.disk_counts[WHITE].get())
+        return not(self.disk_counts[BLACK].get() and self.disk_counts[WHITE].get())
     
     def is_placeable(self, y: int, x: int) -> bool:
         if self.board_data[y][x] != EMPTY:
@@ -138,5 +138,4 @@ class Model:
                 
                 elif sqr_data == self.player.get() and is_opponent_disk_exist:
                     return True
-    
         return False
