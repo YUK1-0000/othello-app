@@ -1,11 +1,6 @@
 import tkinter as tk
 from othello_app import Model, SuperFrame, MenuBar
-
-
-BOARD_LEN = 8
-EMPTY, WHITE, BLACK = 0, 1, -1
-DISK_ICONS = ("", "○", "●")
-ARROW_TYPES = ("", "->", "<-")
+from .constants import SIDE_LEN, WHITE, DISK_TYPES, ARROW_TYPES
 
 
 class Controller:
@@ -16,14 +11,14 @@ class Controller:
         
         # ボタンにコマンドとテキストの変数を設定
         self.super_frame.pass_btn.configure(command=self.change_player)
-        for y in range(BOARD_LEN):
-            for x in range(BOARD_LEN):
+        for y in range(SIDE_LEN):
+            for x in range(SIDE_LEN):
                 self.super_frame.board_btns[y][x].configure(
                     textvariable=self.super_frame.btn_texts[y][x],
                     command=lambda y=y, x=x: self.on_btn_pressed(y, x)
                 )
         
-        for i in range(len(DISK_ICONS)):
+        for i in range(len(DISK_TYPES)):
             self.super_frame.disk_count_labels[i].configure(
                 textvariable=self.model.disk_counts[i]
             )
@@ -52,7 +47,9 @@ class Controller:
 
         # 矢印の更新
         self.super_frame.arrow_label.pack_forget()
-        self.super_frame.arrow_label.configure(text=ARROW_TYPES[self.model.player.get()])
+        self.super_frame.arrow_label.configure(
+            text=ARROW_TYPES[self.model.player.get()]
+        )
         self.super_frame.arrow_label.pack(
             side=tk.RIGHT if self.model.player.get() == WHITE else tk.LEFT
         )
@@ -63,12 +60,12 @@ class Controller:
             self.super_frame.pass_btn.pack()
 
     def update_btns(self, hilite_y: int | None=None, hilite_x: int | None=None) -> None:
-        for y in range(BOARD_LEN):
-            for x in range(BOARD_LEN):
+        for y in range(SIDE_LEN):
+            for x in range(SIDE_LEN):
                 # データとテキストを同期し、配置可能なマスは強調
                 self.super_frame.btn_texts[y][x].set(
                     "x" if self.model.is_placeable(y, x)
-                    else DISK_ICONS[self.model.board_data[y][x]]
+                    else DISK_TYPES[self.model.board_data[y][x]]
                 )
                 
                 # 引数の座標のマスを強調

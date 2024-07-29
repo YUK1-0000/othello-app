@@ -1,20 +1,12 @@
 import tkinter as tk
+from .constants import SIDE_LEN, EMPTY, WHITE, BLACK, DISK_TYPES, DIRECTIONS
 
-
-BOARD_LEN = 8
-DIRECTIONS = (
-    (-1, -1), (-1, 0), (-1, 1),
-    ( 0, -1),          ( 0, 1),
-    ( 1, -1), ( 1, 0), ( 1, 1)
-)
-EMPTY, WHITE, BLACK = 0, 1, -1
-DISK_ICONS = ("", "○", "●")
 
 class Model:
     def __init__(self, root: tk.Tk) -> None:
         self.player = tk.IntVar(value=BLACK)
-        self.disk_counts = [tk.IntVar() for _ in range(len(DISK_ICONS))]
-        self.board_data = [[EMPTY for _ in range(BOARD_LEN)] for _ in range(BOARD_LEN)]
+        self.disk_counts = [tk.IntVar() for _ in range(len(DISK_TYPES))]
+        self.board_data = [[EMPTY for _ in range(SIDE_LEN)] for _ in range(SIDE_LEN)]
         self.reset()
     
     def on_btn_pressed(self, y: int, x: int) -> None:
@@ -34,7 +26,7 @@ class Model:
             y_, x_ = y+d[0], x+d[1]
             
             if (
-                not(0 <= y_ < BOARD_LEN and 0 <= x_ < BOARD_LEN)
+                not(0 <= y_ < SIDE_LEN and 0 <= x_ < SIDE_LEN)
                 or self.board_data[y_][x_] != self.player.get()*-1
             ):
                 continue
@@ -42,10 +34,10 @@ class Model:
             # 2マス目以降の探索
             opponent_disk_count = 1
             
-            for n in range(1, BOARD_LEN):
+            for n in range(1, SIDE_LEN):
                 y_, x_ = y+d[0]*n, x+d[1]*n
                 
-                if not(0 <= y_ < BOARD_LEN and 0 <= x_ < BOARD_LEN):
+                if not(0 <= y_ < SIDE_LEN and 0 <= x_ < SIDE_LEN):
                     break
                 
                 sqr_data = self.board_data[y_][x_]
@@ -59,7 +51,7 @@ class Model:
                 elif sqr_data == self.player.get():
                     # 石を返す
                     for m in range(1, opponent_disk_count):
-                        self.place_disk(x+d[1]*m, y+d[0]*m, self.player.get())
+                        self.place_disk(y+d[0]*m, x+d[1]*m, self.player.get())
                     break
     
     def turn_end(self) -> None:
@@ -70,8 +62,8 @@ class Model:
     
     def count_disk(self) -> None:
         [int_var.set(0) for int_var in self.disk_counts]
-        for y in range(BOARD_LEN):
-            for x in range(BOARD_LEN):
+        for y in range(SIDE_LEN):
+            for x in range(SIDE_LEN):
                 disk_type = self.board_data[y][x]
                 self.disk_counts[disk_type].set(self.disk_counts[disk_type].get()+1)
     
@@ -81,23 +73,23 @@ class Model:
         self.count_disk()
     
     def reset_board_data(self) -> None:
-        for y in range(BOARD_LEN):
-            for x in range(BOARD_LEN):
-                if x in (BOARD_LEN/2, BOARD_LEN/2-1) and y in (BOARD_LEN/2, BOARD_LEN/2-1):
+        for y in range(SIDE_LEN):
+            for x in range(SIDE_LEN):
+                if x in (SIDE_LEN/2, SIDE_LEN/2-1) and y in (SIDE_LEN/2, SIDE_LEN/2-1):
                     disk_type = WHITE if x == y else BLACK
                 else :
                     disk_type = EMPTY
                 self.place_disk(y, x, disk_type)
     
     def get_placeable_coords(self) -> list[list[int]]:
-        return[
-            i for i in
+        return [
+            coord for coord in
             [
                 [y, x] if self.is_placeable(y, x) else None
-                for x in range(BOARD_LEN)
-                for y in range(BOARD_LEN)
+                for x in range(SIDE_LEN)
+                for y in range(SIDE_LEN)
             ]
-            if i
+            if coord
         ]
     
     def is_game_over(self) -> bool:
@@ -119,7 +111,7 @@ class Model:
             y_, x_ = y+d[0], x+d[1]
             
             if (
-                not (0 <= y_ < BOARD_LEN and 0 <= x_ < BOARD_LEN)
+                not (0 <= y_ < SIDE_LEN and 0 <= x_ < SIDE_LEN)
                 or self.board_data[y_][x_] != self.player.get()*-1
             ):
                 continue
@@ -127,11 +119,11 @@ class Model:
             # 2マス目以降の探索
             is_opponent_disk_exist = False
             
-            for n in range(1, BOARD_LEN):
+            for n in range(1, SIDE_LEN):
                 y_, x_ = y+d[0]*n, x+d[1]*n
                 
                 if (
-                    not (0 <= y_ < BOARD_LEN and 0 <= x_ < BOARD_LEN)
+                    not (0 <= y_ < SIDE_LEN and 0 <= x_ < SIDE_LEN)
                     or self.board_data[y_][x_] == EMPTY
                 ):
                     break

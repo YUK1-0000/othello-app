@@ -1,20 +1,21 @@
 import tkinter as tk
-
-
-BOARD_LEN = 8
-TITLE = "Othello App"
-WINDOW_SIZE = "360x340"
-FONT = ""
-FONT_SIZES = {
-    "m": 16,
-    "l": 24
-}
-SQR_BTN_W, SQR_BTN_H = 3, 1
-DISK_ICONS = ("", "○", "●")
-ARROW_TYPES = ("", "->", "<-")
-HILITE_CLR = "#ff4c4c"
-PASS_BTN_MSG = "Pass"
-GAME_OVER_MSG = "GAME OVER!"
+from .constants import (
+    BLACK,
+    EMPTY,
+    TITLE,
+    WHITE,
+    WINDOW_SIZE,
+    FONT,
+    FONT_SIZES,
+    HILITE_CLR,
+    GAME_OVER_MSG,
+    PASS_BTN_MSG,
+    SIDE_LEN,
+    DISK_TYPES,
+    ARROW_TYPES,
+    SQR_BTN_W,
+    SQR_BTN_H,
+)
 
 
 class SuperFrame(tk.Frame):
@@ -24,7 +25,7 @@ class SuperFrame(tk.Frame):
         root.geometry(WINDOW_SIZE)
         root.resizable(width=False, height=False)
         
-        self.btn_texts = [[tk.StringVar() for _ in range(BOARD_LEN)] for _ in range(BOARD_LEN)]
+        self.btn_texts = [[tk.StringVar() for _ in range(SIDE_LEN)] for _ in range(SIDE_LEN)]
         
         # 盤面
         self.board_frame = tk.Frame(self)
@@ -38,15 +39,15 @@ class SuperFrame(tk.Frame):
                     font=(FONT, FONT_SIZES["m"]),
                     textvariable=self.btn_texts[y][x],
                 )
-                for x in range(BOARD_LEN)
+                for x in range(SIDE_LEN)
             ]
-            for y in range(BOARD_LEN)
+            for y in range(SIDE_LEN)
         ]
         
         self.board_frame.pack()
         
-        for y in range(BOARD_LEN):
-            for x in range(BOARD_LEN):
+        for y in range(SIDE_LEN):
+            for x in range(SIDE_LEN):
                 self.board_btns[y][x].grid(column=x, row=y)
 
         # 画面下側
@@ -68,23 +69,24 @@ class SuperFrame(tk.Frame):
             tk.Label(
                 self.bottom_frame,
                 font=(FONT, FONT_SIZES["l"]),
-                textvariable=tk.StringVar(value=DISK_ICONS[type_])
+                textvariable=tk.StringVar(value=DISK_TYPES[type_])
             )
-            for type_ in range(len(DISK_ICONS))
+            for type_ in range(len(DISK_TYPES))
         ]
         self.disk_count_labels = [
             tk.Label(
                 self.bottom_frame,
                 font=(FONT, FONT_SIZES["l"]),
             )
-            for _ in range(len(DISK_ICONS))
+            for _ in range(len(DISK_TYPES))
         ]
 
         self.bottom_frame.pack(fill=tk.BOTH)
         
-        for i, s in (zip(range(1, len(DISK_ICONS)), (tk.RIGHT, tk.LEFT))):
-            self.disk_count_labels[i].pack(side=s)
-            self.disk_labels[i].pack(side=s)
+        for type_ in BLACK, WHITE:
+            s = tk.LEFT if type_ == BLACK else tk.RIGHT
+            self.disk_count_labels[type_].pack(side=s)
+            self.disk_labels[type_].pack(side=s)
         
         self.pack()
     
