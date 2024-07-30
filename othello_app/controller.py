@@ -72,7 +72,7 @@ class Controller:
         self.super_frame.pass_btn.pack_forget()
         if not self.model.get_placeable_coords():
             self.super_frame.pass_btn.pack()
-
+    
     def update_lbls(self) -> None:
         self.super_frame.arrow_lbl.pack_forget()
         self.super_frame.arrow_lbl.configure(

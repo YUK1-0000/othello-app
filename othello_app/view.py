@@ -99,7 +99,7 @@ class SuperFrame(tk.Frame):
 
     def show_pass_btn(self) -> None:
         self.pass_btn.pack()
-
+    
     def game_over(self) -> None:
         self.arrow_lbl.pack_forget()
         self.pass_btn.pack_forget()

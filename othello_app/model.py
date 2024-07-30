@@ -49,7 +49,7 @@ class Model:
                     for m in range(1, opponent_disk_count):
                         self.board_data[y+d[0]*m][x+d[1]*m] = self.player.get()
                     break
-
+    
     def change_player(self) -> None:
         self.player.set(self.player.get()*-1)
     

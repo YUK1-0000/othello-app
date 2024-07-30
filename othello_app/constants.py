@@ -5,7 +5,7 @@ FONT_SIZES = {
     "m": 16,
     "l": 24
 }
-PLACEABLE_TXT = "x"
+PLACEABLE_TXT = "・"
 GAME_OVER_MSG = "GAME OVER!"
 PASS_BTN_MSG = "Pass"
 
