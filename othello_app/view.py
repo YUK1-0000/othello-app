@@ -73,9 +73,9 @@ class SuperFrame(tk.Frame):
             tk.Label(
                 self.bottom_frame,
                 font=(FONT, FONT_SIZES["l"]),
-                textvariable=tk.StringVar(value=DISK_TYPES[disk_clr])
+                textvariable=tk.StringVar(value=DISK_TYPES[disk_type])
             )
-            for disk_clr in range(len(DISK_TYPES))
+            for disk_type in range(len(DISK_TYPES))
         ]
         self.disk_count_lbls = [
             tk.Label(
@@ -87,10 +87,10 @@ class SuperFrame(tk.Frame):
 
         self.bottom_frame.pack(fill=tk.BOTH)
         
-        for disk_clr in BLACK, WHITE:
-            s = tk.LEFT if disk_clr == BLACK else tk.RIGHT
-            self.disk_count_lbls[disk_clr].pack(side=s)
-            self.disk_lbls[disk_clr].pack(side=s)
+        for disk_type in BLACK, WHITE:
+            s = tk.LEFT if disk_type == BLACK else tk.RIGHT
+            self.disk_count_lbls[disk_type].pack(side=s)
+            self.disk_lbls[disk_type].pack(side=s)
         
         self.pack()
 

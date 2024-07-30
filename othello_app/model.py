@@ -9,9 +9,9 @@ class Model:
         self.board_data = [[EMPTY for _ in range(SIDE_LEN)] for _ in range(SIDE_LEN)]
         self.move_history: list[tuple[int, int] | None] = []
         self.reset()
-    
-    def place_disk(self, y: int, x: int, disk_clr: int) -> None:
-        self.board_data[y][x] = disk_clr
+
+    def place_disk(self, y: int, x: int, disk_type: int) -> None:
+        self.board_data[y][x] = disk_type
         self.move_history.append((y, x))
     
     def flip(self, y: int, x: int) -> None:
@@ -51,8 +51,8 @@ class Model:
         [int_var.set(0) for int_var in self.disk_counts]
         for y in range(SIDE_LEN):
             for x in range(SIDE_LEN):
-                disk_clr = self.board_data[y][x]
-                self.disk_counts[disk_clr].set(self.disk_counts[disk_clr].get()+1)
+                disk_type = self.board_data[y][x]
+                self.disk_counts[disk_type].set(self.disk_counts[disk_type].get()+1)
     
     def reset(self) -> None:
         self.player.set(BLACK)
@@ -64,14 +64,14 @@ class Model:
         for y in range(SIDE_LEN):
             for x in range(SIDE_LEN):
                 if x in (SIDE_LEN/2, SIDE_LEN/2-1) and y in (SIDE_LEN/2, SIDE_LEN/2-1):
-                    disk_clr = (
+                    disk_type = (
                         WHITE
                         if x == y
                         else BLACK
                     )
-                else :
-                    disk_clr = EMPTY
-                self.board_data[y][x] = disk_clr
+                else:
+                    disk_type = EMPTY
+                self.board_data[y][x] = disk_type
     
     def get_placeable_coords(self) -> list[tuple[int, int]]:
         return [
