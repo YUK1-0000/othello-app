@@ -9,7 +9,7 @@ class Model:
         self.board_data = [[EMPTY for _ in range(SIDE_LEN)] for _ in range(SIDE_LEN)]
         self.move_history: list[tuple[int, int] | None] = []
         self.reset()
-
+    
     def place_disk(self, y: int, x: int, disk_clr: int) -> None:
         self.board_data[y][x] = disk_clr
         self.move_history.append((y, x))
@@ -19,7 +19,7 @@ class Model:
         for d in DIRECTIONS:
             
             # 1マス目の探索
-            y_, x_ = y+d[0], x+d[1]
+            y_, x_ = y+d.y, x+d.x
             
             if (
                 not(0 <= y_ < SIDE_LEN and 0 <= x_ < SIDE_LEN)
@@ -31,7 +31,7 @@ class Model:
             opponent_disk_count = 1
             
             for n in range(1, SIDE_LEN):
-                y_, x_ = y+d[0]*n, x+d[1]*n
+                y_, x_ = y+d.y*n, x+d.x*n
                 
                 if not(0 <= y_ < SIDE_LEN and 0 <= x_ < SIDE_LEN):
                     break
@@ -47,7 +47,7 @@ class Model:
                 elif sqr_data == self.player.get():
                     # 石を返す
                     for m in range(1, opponent_disk_count):
-                        self.board_data[y+d[0]*m][x+d[1]*m] = self.player.get()
+                        self.board_data[y+d.y*m][x+d.x*m] = self.player.get()
                     break
     
     def change_player(self) -> None:
@@ -108,7 +108,7 @@ class Model:
         # 8方向を探索
         for d in DIRECTIONS:
             # 1マス目の探索
-            y_, x_ = y+d[0], x+d[1]
+            y_, x_ = y+d.y, x+d.x
             
             if (
                 not (0 <= y_ < SIDE_LEN and 0 <= x_ < SIDE_LEN)
@@ -120,7 +120,7 @@ class Model:
             is_opponent_disk_exist = False
             
             for n in range(1, SIDE_LEN):
-                y_, x_ = y+d[0]*n, x+d[1]*n
+                y_, x_ = y+d.y*n, x+d.x*n
                 
                 if (
                     not (0 <= y_ < SIDE_LEN and 0 <= x_ < SIDE_LEN)

@@ -1,3 +1,6 @@
+from collections import namedtuple
+
+
 TITLE = "Othello App"
 WINDOW_SIZE = "360x340"
 FONT = ""
@@ -16,8 +19,9 @@ ARROW_TYPES = ("", "←", "→")
 
 SQR_BTN_W, SQR_BTN_H = 3, 1
 
-DIRECTIONS = (
-    (-1, -1), (-1, 0), (-1, 1),
-    ( 0, -1),          ( 0, 1),
-    ( 1, -1), ( 1, 0), ( 1, 1)
-)
+DIRECTIONS = [
+    namedtuple("Direction", ["y", "x"])(y, x)
+    for x in range(-1, 2)
+    for y in range(-1, 2)
+    if y or x
+]
