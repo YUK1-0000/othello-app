@@ -20,7 +20,10 @@ class Model:
             
             # 1マス目の探索
             if (
-                not(0 <= (y_ := y+d.y) < SIDE_LEN and 0 <= (x_ := x+d.x) < SIDE_LEN)
+                not (
+                    0 <= (y_ := y+d.y) < SIDE_LEN
+                    and 0 <= (x_ := x+d.x) < SIDE_LEN
+                )
                 or self.board_data[y_][x_] != self.player.get()*-1
             ):
                 continue
@@ -29,7 +32,10 @@ class Model:
             opponent_disk_count = 1
             
             for n in range(1, SIDE_LEN):
-                if not(0 <= (y_ := y+d.y*n) < SIDE_LEN and 0 <= (x_ := x+d.x*n) < SIDE_LEN):
+                if not (
+                    0 <= (y_ := y+d.y*n) < SIDE_LEN
+                    and 0 <= (x_ := x+d.x*n) < SIDE_LEN
+                ):
                     break
                 
                 if (sqr_data := self.board_data[y_][x_]) == EMPTY:
@@ -93,7 +99,7 @@ class Model:
         return all(all(data) for data in self.board_data)
     
     def is_perfect_win(self) -> bool:
-        return not(self.disk_counts[BLACK].get() and self.disk_counts[WHITE].get())
+        return not (self.disk_counts[BLACK].get() and self.disk_counts[WHITE].get())
     
     def is_placeable(self, y: int, x: int) -> bool:
         if self.board_data[y][x] != EMPTY:
@@ -103,7 +109,10 @@ class Model:
         for d in DIRECTIONS:
             # 1マス目の探索
             if (
-                not (0 <= (y_ := y+d.y) < SIDE_LEN and 0 <= (x_ := x+d.x) < SIDE_LEN)
+                not (
+                    0 <= (y_ := y+d.y) < SIDE_LEN
+                    and 0 <= (x_ := x+d.x) < SIDE_LEN
+                )
                 or self.board_data[y_][x_] != self.player.get()*-1
             ):
                 continue
@@ -113,7 +122,10 @@ class Model:
             
             for n in range(1, SIDE_LEN):
                 if (
-                    not (0 <= (y_ := y+d.y*n) < SIDE_LEN and 0 <= (x_ := x+d.x*n) < SIDE_LEN)
+                    not (
+                        0 <= (y_ := y+d.y*n) < SIDE_LEN
+                        and 0 <= (x_ := x+d.x*n) < SIDE_LEN
+                    )
                     or self.board_data[y_][x_] == EMPTY
                 ):
                     break
