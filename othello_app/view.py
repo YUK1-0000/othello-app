@@ -116,8 +116,8 @@ class MenuBar(tk.Menu):
         self,
         root: tk.Tk,
         *,
-        reset_cmd: Callable,
-        undo_move_cmd: Callable
+        reset_cmd: Callable[[], None],
+        undo_move_cmd: Callable[[], None]
     ) -> None:
         
         super().__init__(root)
