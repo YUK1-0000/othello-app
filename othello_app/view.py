@@ -2,18 +2,15 @@ import tkinter as tk
 from typing import Callable
 from .constants import (
     BLACK,
-    EMPTY,
     TITLE,
     WHITE,
     WINDOW_SIZE,
     FONT,
     FONT_SIZES,
-    PLACEABLE_TXT,
     GAME_OVER_MSG,
     PASS_BTN_MSG,
     SIDE_LEN,
     DISK_TYPES,
-    ARROW_TYPES,
     SQR_BTN_W,
     SQR_BTN_H,
 )

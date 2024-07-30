@@ -19,10 +19,8 @@ class Model:
         for d in DIRECTIONS:
             
             # 1マス目の探索
-            y_, x_ = y+d.y, x+d.x
-            
             if (
-                not(0 <= y_ < SIDE_LEN and 0 <= x_ < SIDE_LEN)
+                not(0 <= (y_ := y+d.y) < SIDE_LEN and 0 <= (x_ := x+d.x) < SIDE_LEN)
                 or self.board_data[y_][x_] != self.player.get()*-1
             ):
                 continue
@@ -31,14 +29,10 @@ class Model:
             opponent_disk_count = 1
             
             for n in range(1, SIDE_LEN):
-                y_, x_ = y+d.y*n, x+d.x*n
-                
-                if not(0 <= y_ < SIDE_LEN and 0 <= x_ < SIDE_LEN):
+                if not(0 <= (y_ := y+d.y*n) < SIDE_LEN and 0 <= (x_ := x+d.x*n) < SIDE_LEN):
                     break
                 
-                sqr_data = self.board_data[y_][x_]
-                
-                if sqr_data == EMPTY:
+                if (sqr_data := self.board_data[y_][x_]) == EMPTY:
                     break # 返せる石が無いのでこの方向の探索をやめる
                 
                 if sqr_data == self.player.get()*-1:
@@ -108,10 +102,8 @@ class Model:
         # 8方向を探索
         for d in DIRECTIONS:
             # 1マス目の探索
-            y_, x_ = y+d.y, x+d.x
-            
             if (
-                not (0 <= y_ < SIDE_LEN and 0 <= x_ < SIDE_LEN)
+                not (0 <= (y_ := y+d.y) < SIDE_LEN and 0 <= (x_ := x+d.x) < SIDE_LEN)
                 or self.board_data[y_][x_] != self.player.get()*-1
             ):
                 continue
@@ -120,17 +112,13 @@ class Model:
             is_opponent_disk_exist = False
             
             for n in range(1, SIDE_LEN):
-                y_, x_ = y+d.y*n, x+d.x*n
-                
                 if (
-                    not (0 <= y_ < SIDE_LEN and 0 <= x_ < SIDE_LEN)
+                    not (0 <= (y_ := y+d.y*n) < SIDE_LEN and 0 <= (x_ := x+d.x*n) < SIDE_LEN)
                     or self.board_data[y_][x_] == EMPTY
                 ):
                     break
                 
-                sqr_data = self.board_data[y_][x_]
-                
-                if sqr_data == EMPTY:
+                if (sqr_data := self.board_data[y_][x_]) == EMPTY:
                     break
                 
                 if sqr_data == self.player.get()*-1:
