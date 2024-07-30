@@ -12,7 +12,7 @@ PASS_BTN_MSG = "Pass"
 SIDE_LEN = 8
 EMPTY, BLACK, WHITE = 0, 1, -1
 DISK_TYPES = ("", "●", "○")
-ARROW_TYPES = ("", "<-", "->")
+ARROW_TYPES = ("", "←", "→")
 
 SQR_BTN_W, SQR_BTN_H = 3, 1
 
