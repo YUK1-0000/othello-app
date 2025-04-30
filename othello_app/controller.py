@@ -22,25 +22,26 @@ class Controller:
                     command=lambda y=y, x=x: self.on_btn_pressed(y, x)
                 )
         
-        for i in range(len(DISK_TYPES)):
-            self.super_frame.disk_count_lbls[i].configure(
-                textvariable=self.model.disk_counts[i]
+        for disk_type in range(len(DISK_TYPES)):
+            self.super_frame.disk_count_lbls[disk_type].configure(
+                textvariable=self.model.disk_counts[disk_type]
             )
         
         self.reset()
 
     # 石を打つときに呼ばれる関数
     def on_btn_pressed(self, y: int, x: int) -> None:
-        if self.model.is_placeable(y, x):
-            self.model.place_disk(y, x, self.model.player.get())
-            self.model.flip(y, x)
-            self.model.change_player()
-            
-            self.update(hilite_coord=(y, x))
-            
-            if self.model.is_game_over():
-                self.game_over()
-                return
+        if not self.model.is_placeable(y, x):
+            return
+        
+        self.model.place_disk(y, x)
+        self.model.flip(y, x)
+        self.model.change_player()
+        
+        self.update(hilite_coord=(y, x))
+        
+        if self.model.is_game_over():
+            self.game_over()
 
     def on_pass_btn_pressed(self) -> None:
         self.model.move_history.append(None)
@@ -95,7 +96,7 @@ class Controller:
         
         for move in move_hist:
             if move:
-                self.model.place_disk(*move, self.model.player.get())
+                self.model.place_disk(*move)
                 self.model.flip(*move)
             self.model.change_player()
         self.update(hilite_coord=(move))

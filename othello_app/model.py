@@ -10,8 +10,8 @@ class Model:
         self.move_history: list[tuple[int, int] | None] = []
         self.reset()
 
-    def place_disk(self, y: int, x: int, disk_type: int) -> None:
-        self.board_data[y][x] = disk_type
+    def place_disk(self, y: int, x: int) -> None:
+        self.board_data[y][x] = self.player.get()
         self.move_history.append((y, x))
     
     def flip(self, y: int, x: int) -> None:
@@ -23,8 +23,7 @@ class Model:
                 not (
                     0 <= (y_ := y+d.y) < SIDE_LEN
                     and 0 <= (x_ := x+d.x) < SIDE_LEN
-                )
-                or self.board_data[y_][x_] != self.player.get()*-1
+                ) or self.board_data[y_][x_] != self.player.get()*-1
             ):
                 continue
             
@@ -81,15 +80,10 @@ class Model:
     
     def get_placeable_coords(self) -> list[tuple[int, int]]:
         return [
-            coord for coord in
-            [
-                (y, x)
-                if self.is_placeable(y, x)
-                else None
-                for x in range(SIDE_LEN)
-                for y in range(SIDE_LEN)
-            ]
-            if coord
+            (y, x)
+            for x in range(SIDE_LEN)
+            for y in range(SIDE_LEN)
+            if self.is_placeable(y, x)
         ]
     
     def is_game_over(self) -> bool:

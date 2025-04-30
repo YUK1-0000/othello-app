@@ -23,30 +23,22 @@ class SuperFrame(tk.Frame):
         root.geometry(WINDOW_SIZE)
         root.resizable(width=False, height=False)
         
-        self.btn_texts = [
-            [
-                tk.StringVar()
-                for _ in range(SIDE_LEN)
-            ]
-            for _ in range(SIDE_LEN)
-        ]
+        self.btn_texts = [[
+                tk.StringVar() for _ in range(SIDE_LEN)
+        ] for _ in range(SIDE_LEN)]
         
         # 盤面
         self.board_frame = tk.Frame(self)
         
-        self.board_btns = [
-            [
-                tk.Button(
-                    self.board_frame,
-                    width=SQR_BTN_W,
-                    height=SQR_BTN_H,
-                    font=(FONT, FONT_SIZES["m"]),
-                    textvariable=self.btn_texts[y][x]
-                )
-                for x in range(SIDE_LEN)
-            ]
-            for y in range(SIDE_LEN)
-        ]
+        self.board_btns = [[
+            tk.Button(
+                self.board_frame,
+                width=SQR_BTN_W,
+                height=SQR_BTN_H,
+                font=(FONT, FONT_SIZES["m"]),
+                textvariable=self.btn_texts[y][x]
+            ) for x in range(SIDE_LEN)
+        ] for y in range(SIDE_LEN)]
         
         self.board_frame.pack()
         
@@ -74,26 +66,28 @@ class SuperFrame(tk.Frame):
                 self.bottom_frame,
                 font=(FONT, FONT_SIZES["l"]),
                 textvariable=tk.StringVar(value=DISK_TYPES[disk_type])
-            )
-            for disk_type in range(len(DISK_TYPES))
+            ) for disk_type in range(len(DISK_TYPES))
         ]
         self.disk_count_lbls = [
             tk.Label(
                 self.bottom_frame,
                 font=(FONT, FONT_SIZES["l"]),
-            )
-            for _ in range(len(DISK_TYPES))
+            ) for _ in range(len(DISK_TYPES))
         ]
 
         self.bottom_frame.pack(fill=tk.BOTH)
         
         for disk_type in BLACK, WHITE:
-            s = tk.LEFT if disk_type == BLACK else tk.RIGHT
+            s = (
+                tk.LEFT
+                if disk_type == BLACK
+                else tk.RIGHT
+            )
             self.disk_count_lbls[disk_type].pack(side=s)
             self.disk_lbls[disk_type].pack(side=s)
         
         self.pack()
-
+    
     def show_pass_btn(self) -> None:
         self.pass_btn.pack()
     
